@@ -18,11 +18,12 @@ class Simulation:
     def __init__(self) -> None:
         self.width = 1500
         self.height = 1500
-        self.number_of_colors = 3
-        self.number_of_particles = 100
+        self.number_of_colors = 5
+        self.number_of_particles = 150
 
-        self.delta_time = 0.02
+        self.delta_time = 0.005
         self.friction_force = 0.2
+        self.maximum_radius = 0.1
 
         self.attraction_matrix = self.generate_attraction_matrix()
         self.particles, self.color_dictionary = self.generate_particles()
@@ -35,7 +36,7 @@ class Simulation:
 
         for color in matrix:
             for _ in range(self.number_of_colors):
-                color.append(random.uniform(-1, 1))
+                color.append(random.uniform(-0.5, 1))
 
         return matrix
 
@@ -80,6 +81,7 @@ class Simulation:
                 rx = particle2.x - particle1.x
                 ry = particle2.y - particle1.y
                 r = math.hypot(rx, ry)
+                if r == 0: continue
 
                 # Calculate the accelerations of each particle based on the distance to other particles and the attraction matrix
                 repulsion_distance = 0.2
@@ -87,7 +89,7 @@ class Simulation:
                 if r < repulsion_distance: 
                     attraction_force = (r / repulsion_distance) - 1
                 elif repulsion_distance < r and r < 1: 
-                    attraction_force = attraction * (1 - abs(2 * r - 1 - repulsion_distance) / (1 - repulsion_distance))
+                    attraction_force = (attraction / self.maximum_radius) * (1 - abs(2 * r - 1 - repulsion_distance) / (1 - repulsion_distance))
                 else:
                     attraction_force = 0
 
@@ -96,16 +98,19 @@ class Simulation:
                 acceleration_Y += attraction_force * ry / r
 
             # Update the velocities based on the accelerations of each particle
+            particle1.velocityX *= self.maximum_radius
+            particle1.velocityY *= self.maximum_radius
+
             particle1.velocityX *= self.friction_force
             particle1.velocityY *= self.friction_force    
 
-            particle1.velocityX += particle1.velocityX + acceleration_X * self.delta_time
-            particle1.velocityY += particle1.velocityY + acceleration_Y * self.delta_time
+            particle1.velocityX += acceleration_X * self.delta_time
+            particle1.velocityY += acceleration_Y * self.delta_time
 
         # Update positions based on velocities
         for particle in self.particles:
-            particle.x = (particle.x + particle.velocityX * self.delta_time) % self.width
-            particle.y = (particle.y + particle.velocityY * self.delta_time) % self.height
+            particle.x += particle.velocityX * self.delta_time
+            particle.y += particle.velocityY * self.delta_time
 
     
     def mainloop(self) -> None:
@@ -129,8 +134,8 @@ class Simulation:
             window.fill((0, 0, 0))
 
             for particle in self.particles:
-                scaled_x = (particle.x * self.width) // 1
-                scaled_y = (particle.y * self.height) // 1
+                scaled_x = particle.x * self.width
+                scaled_y = particle.y * self.height
                 pygame.draw.circle(window, particle.color, (scaled_x, scaled_y), 3, 0)
 
             self.update_particles()
