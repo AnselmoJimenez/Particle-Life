@@ -1,4 +1,5 @@
 import pygame
+import tkinter
 import random
 import math
 
@@ -14,11 +15,13 @@ class Particle:
         return f"Particle: {self.color} at Location {self.x, self.y}"
 
 
-class Simulation:
-    def __init__(self) -> None:
+class Simulation (tkinter.Canvas):
+    def __init__(self, master, **kwargs) -> None:
+        super().__init__(master, **kwargs)
+
         self.width = 1500
         self.height = 1500
-        self.number_of_colors = 5
+        self.number_of_colors = 3
         self.number_of_particles = 150
 
         self.delta_time = 0.005
@@ -28,7 +31,7 @@ class Simulation:
         self.attraction_matrix = self.generate_attraction_matrix()
         self.particles, self.color_dictionary = self.generate_particles()
 
-        self.mainloop()
+        self.draw_particles()
     
      # Go through each color and give it an attraction based on randomness
     def generate_attraction_matrix(self) -> list[list[int]]:
@@ -36,7 +39,7 @@ class Simulation:
 
         for color in matrix:
             for _ in range(self.number_of_colors):
-                color.append(random.uniform(-0.5, 1))
+                color.append(random.uniform(-1, 1))
 
         return matrix
 
@@ -67,7 +70,7 @@ class Simulation:
         color_dictionary = {color : index for index, color in enumerate(colors_index)}
         return particles, color_dictionary
     
-    # # Go through each particle, compare it against all other particles, update accordingly
+    # # Go through each particle, compare it against all other particles, update positions and velocities accordingly
     def update_particles(self) -> None:
         # Update accelerations and velocities
         for particle1 in self.particles:
@@ -84,7 +87,7 @@ class Simulation:
                 if r == 0: continue
 
                 # Calculate the accelerations of each particle based on the distance to other particles and the attraction matrix
-                repulsion_distance = 0.2
+                repulsion_distance = 0.1
                 attraction = self.attraction_matrix[self.color_dictionary[particle1.color]][self.color_dictionary[particle2.color]]
                 if r < repulsion_distance: 
                     attraction_force = (r / repulsion_distance) - 1
@@ -111,35 +114,46 @@ class Simulation:
         for particle in self.particles:
             particle.x += particle.velocityX * self.delta_time
             particle.y += particle.velocityY * self.delta_time
-
     
-    def mainloop(self) -> None:
-        pygame.init()
+    def draw_particles(self) -> None:
+        self.update_particles()
 
-        # Display the Window
-        window = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
-        pygame.display.set_caption("Particle-Life")
+        self.delete("all") # Clear the screen
+        self.create_rectangle(0, 0, self.winfo_reqwidth(), self.winfo_reqheight(), fill="black", outline="black")
 
-        run = True
-        FPS = 60
-        clock = pygame.time.Clock()
+        # Redraw all particles
+        for particle in self.particles:
+            radius = 5
+            scaled_x = particle.x * self.width
+            scaled_y = particle.y * self.height
+            rgb_color = "#{:02x}{:02x}{:02x}".format(particle.color[0], particle.color[1], particle.color[2])
 
-        while run:
-            clock.tick(FPS)
+            self.create_oval(scaled_x - radius, scaled_y - radius, scaled_x + radius, scaled_y + radius, fill=rgb_color)
+        
+        self.after(1, self.draw_particles)
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT: run = False
 
-            # Reset display each update and update the particles
-            window.fill((0, 0, 0))
+def main():
+    root = tkinter.Tk()
+    root.title("Particle Life")
+    root.geometry(f"1500x1500")
+    root.resizable(True, True)
 
-            for particle in self.particles:
-                scaled_x = particle.x * self.width
-                scaled_y = particle.y * self.height
-                pygame.draw.circle(window, particle.color, (scaled_x, scaled_y), 3, 0)
+    # Editing Frame 
+    editing_frame = tkinter.Frame(root, width=100, bg="gray")
+    editing_frame.pack_propagate(False)
+    editing_frame.pack(side="left", fill="y", expand=False, anchor="w")
 
-            self.update_particles()
-            pygame.display.update()
-            
+    # Configuring the frame
+    label = tkinter.Label(editing_frame, text="Particle Life Simulation")
+    label.grid(row=0, column=0, pady=3)
 
-Simulation()
+    # Configuring the Canvas
+    canvas = Simulation(root, bg="black")
+    canvas.pack(side="right", fill="both", expand=True)
+
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()
