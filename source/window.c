@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <raylib.h>
-
 #include "window.h"
-#include "simulation.h"
 
 // create and update window
 void mainloop(void) {
@@ -34,8 +29,8 @@ void mainloop(void) {
     //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
-
-    return 0;
 }
 
-int main(void) {  }
+int main(void) { 
+    mainloop();
+}
