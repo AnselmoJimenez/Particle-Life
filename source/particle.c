@@ -5,7 +5,7 @@
 #include "particle.h"
 
 // Generates the attraction matrix by generating a random number between -1 and 1 in each slot
-void define_attraction_matrix(float **matrix, int num_particles) {
+void generate_attraction_matrix(float **matrix, int num_particles) {
     // Seeding the generator
     srand(time(NULL));
     
