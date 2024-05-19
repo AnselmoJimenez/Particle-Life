@@ -1,3 +1,5 @@
 build/
+.vscode/
+
 particle-life
 particle-life.exe
