@@ -36,6 +36,6 @@ void create_particles(particle_t *particles, int num_particles, int resolution[2
         particles[i].y_velocity = 0.0f;
 
         // define their color
-        
+        (void) num_colors;
     }
 }
