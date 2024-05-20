@@ -11,6 +11,7 @@ typedef struct particle {
     float y_coord;
     float x_velocity;
     float y_velocity;
+    int hash;
     Color color;
 } particle_t;
 

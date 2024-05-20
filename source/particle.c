@@ -3,12 +3,13 @@
 // print particles and their information
 void print_particles(particle_t *particles, int num_particles) {
     for (int i = 0; i < num_particles; i++) {
-        printf("Particle %d\t->\tlocation: (%f, %f); velocity: (%f, %f); color: {%d, %d, %d}\n", 
+        printf("Particle %d\t->\tlocation: (%f, %f); velocity: (%f, %f); hash: %d; color: {%d, %d, %d}\n", 
             i, 
             particles[i].x_coord, 
             particles[i].y_coord,
             particles[i].x_velocity,
             particles[i].y_velocity,
+            particles[i].hash,
             particles[i].color.r, particles[i].color.g, particles[i].color.b
         );
     }
@@ -68,8 +69,7 @@ void create_particles(particle_t *particles, int num_particles, int num_colors, 
         particles[i].y_velocity = 0.0f;
 
         // define their color
+        particles[i].hash = i % num_colors;
         particles[i].color = colors[i % num_colors];
     }
-
-    free(colors);
 }
