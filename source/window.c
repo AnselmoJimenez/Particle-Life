@@ -3,8 +3,8 @@
 #include <math.h>
 
 #define RAYGUI_IMPLEMENTATION
-#include <raygui.h>
 #include <raylib.h>
+#include <raygui.h>
 #undef RAYGUI_IMPLEMENTATION
 
 #include "particle.h"
@@ -32,15 +32,6 @@ void mainloop(void) {
         BeginDrawing();
         ClearBackground(RAYWHITE);
         
-        // Draw button using raygui
-        if (GuiButton((Rectangle){ screen_width / 2 - 50, screen_height / 2 - 25, 100, 50 }, "Button")) {
-            button_clicked = true;
-        }
-
-        // Display message if button is clicked
-        if (button_clicked) {
-            DrawText("Button clicked!", screen_width / 2 - 100, screen_height / 2 + 50, 20, RED);
-        }
         
         EndDrawing();
         //----------------------------------------------------------------------------------
